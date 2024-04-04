@@ -16,6 +16,8 @@ class Program
         {
             Console.WriteLine("1) Read data from file.");
             Console.WriteLine("2) Create data.");
+            Console.WriteLine("3) Search tickets.");
+
             Console.WriteLine("Enter any other key to exit.");
             choice = Console.ReadLine();
 
@@ -38,6 +40,14 @@ class Program
                     Ticket ticket = CreateTicketFromUserInput();
                     if (ticket != null) ticketManager.CreateFileFromData(ticket);
                     break;
+                case "3":
+                    Console.WriteLine("Enter the type of information to search (status, priority, submitter): ");
+                    string searchType = Console.ReadLine();
+                    Console.WriteLine("Enter search term: ");
+                    string searchTerm = Console.ReadLine();
+                    ticketManager.SearchTickets(searchTerm, searchType);
+                    break;
+
                 default:
                     logger.Info("Application ended");
                     return;
@@ -63,7 +73,7 @@ class Program
         string assigned = Console.ReadLine();
         Console.Write("Watching (comma separated): ");
         List<string> watching = new List<string>(Console.ReadLine().Split(','));
-        
+
         // Example for a BugDefectTicket. Extend this with actual data collection for other types.
         if (type.Equals("BugDefect", StringComparison.OrdinalIgnoreCase))
         {

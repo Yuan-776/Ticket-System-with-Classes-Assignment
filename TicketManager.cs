@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NLog;
 
 public class TicketManager
@@ -58,5 +60,40 @@ public class TicketManager
         if (ticket is EnhancementTicket) return enhancementsFilePath;
         if (ticket is TaskTicket) return tasksFilePath;
         throw new ArgumentException("Unknown ticket type.");
+    }
+     public void SearchTickets(string searchTerm, string searchType)
+    {
+        List<string> filePaths = new List<string> { bugDefectsFilePath, enhancementsFilePath, tasksFilePath };
+        List<string[]> allTickets = new List<string[]>();
+
+        foreach (var filePath in filePaths)
+        {
+            if (File.Exists(filePath))
+            {
+                allTickets.AddRange(File.ReadAllLines(filePath).Select(line => line.Split(',')));
+            }
+        }
+
+        IEnumerable<string[]> query = allTickets.AsEnumerable();
+        switch (searchType.ToLower())
+        {
+            case "status":
+                query = allTickets.Where(t => t[2].Equals(searchTerm, StringComparison.OrdinalIgnoreCase));
+                break;
+            case "priority":
+                query = allTickets.Where(t => t[3].Equals(searchTerm, StringComparison.OrdinalIgnoreCase));
+                break;
+            case "submitter":
+                query = allTickets.Where(t => t[4].Equals(searchTerm, StringComparison.OrdinalIgnoreCase));
+                break;
+        }
+
+        int matchCount = query.Count();
+        foreach (var ticket in query)
+        {
+            Console.WriteLine(string.Join(",", ticket));
+        }
+
+        Console.WriteLine($"Number of matches: {matchCount}");
     }
 }
